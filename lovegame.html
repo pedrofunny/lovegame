@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joguinho de Casal</title>
+    <style>
+        /* Estilo Geral */
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-top: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        p {
+            font-size: 1.2em;
+            margin: 10px 20px;
+            line-height: 1.5em;
+        }
+
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 1em;
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            background: #ff6f61;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #ff4b3e;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .result {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .result h2 {
+            font-size: 1.8em;
+        }
+
+        .result p {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ffe5e5;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="loginBox">
+        <h1>💕 Login do Joguinho 💕</h1>
+        <p>Digite seu nome e senha para começar!</p>
+        <input type="text" id="username" placeholder="Nome (Larissa ou Pedro)">
+        <input type="password" id="password" placeholder="Senha">
+        <button onclick="login()">Entrar</button>
+    </div>
+
+    <div id="gameBox" class="hidden">
+        <h1>💕 Joguinho de Casal 💕</h1>
+        <p>Escrevam ideias do que fazer juntos e deixem a sorte decidir!</p>
+
+        <p id="counters"></p>
+        <div>
+            <input type="text" id="inputText" placeholder="Escreva sua ideia aqui...">
+            <button onclick="addIdea()">💌 Adicionar</button>
+        </div>
+
+        <button onclick="revealIdeas()">🎲 Sortear!</button>
+
+        <div class="result hidden" id="resultBox">
+            <h2>✨ Vocês vão fazer: ✨</h2>
+            <p id="selectedIdea"></p>
+        </div>
+    </div>
+
+    <script>
+        // Simulação de login e controle de usuários
+        const users = {
+            Larissa: { password: null, limit: 10 },
+            Pedro: { password: null, limit: 10 },
+        };
+
+        let loggedInUser = null;
+        const ideas = [];
+
+        function login() {
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            if (!users[username]) {
+                alert("Usuário inválido! Escolha Larissa ou Pedro.");
+                return;
+            }
+
+            if (users[username].password === null) {
+                // Primeiro login: definir senha
+                if (password.length < 4) {
+                    alert("A senha deve ter pelo menos 4 caracteres.");
+                    return;
+                }
+                users[username].password = password;
+                alert("Senha definida com sucesso! Faça login novamente.");
+                return;
+            }
+
+            if (users[username].password !== password) {
+                alert("Senha incorreta!");
+                return;
+            }
+
+            loggedInUser = username;
+            document.getElementById("loginBox").classList.add("hidden");
+            document.getElementById("gameBox").classList.remove("hidden");
+            updateCounters();
+        }
+
+        function updateCounters() {
+            const userLimit = users[loggedInUser].limit;
+            const totalIdeas = ideas.length;
+            document.getElementById("counters").textContent = 
+                `${loggedInUser} pode adicionar mais ${userLimit} ideias. Total de ideias no sorteio: ${totalIdeas}.`;
+        }
+
+        function addIdea() {
+            const input = document.getElementById("inputText");
+            const idea = input.value.trim();
+
+            if (!idea) {
+                alert("Por favor, escreva algo antes de adicionar!");
+                return;
+            }
+
+            if (users[loggedInUser].limit <= 0) {
+                alert(`${loggedInUser}, você já adicionou o máximo de ideias permitido!`);
+                return;
+            }
+
+            ideas.push(idea); // Adiciona ao array
+            users[loggedInUser].limit -= 1; // Reduz o limite do usuário
+            alert("Ideia adicionada com sucesso!");
+            input.value = ""; // Limpa o campo de entrada
+            updateCounters();
+        }
+
+        function revealIdeas() {
+            if (ideas.length === 0) {
+                alert("Nenhuma ideia foi adicionada ainda!");
+                return;
+            }
+            const randomIndex = Math.floor(Math.random() * ideas.length);
+            const selectedIdea = ideas.splice(randomIndex, 1)[0]; // Remove a ideia sorteada
+
+            // Exibe a ideia sorteada
+            document.getElementById("selectedIdea").textContent = selectedIdea;
+            document.getElementById("resultBox").classList.remove("hidden");
+            updateCounters();
+        }
+    </script>
+</body>
+</html>
